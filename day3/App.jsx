@@ -13,9 +13,9 @@ function App() {
     <div>
       1111
       <Child num={10} />
-      <Child num={20} />
+      {/* <Child num={20} />
       <Child num={30} />
-      <Panent id={250} />
+      <Panent id={250} /> */}
     </div>
   );
 }

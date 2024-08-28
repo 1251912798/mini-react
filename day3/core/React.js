@@ -81,36 +81,42 @@ function initChildren(fiber, children) {
   });
 }
 
-function performWorkOfUnit(fiber) {
-  const isFunctionComponent = typeof fiber.type === "function";
-  if (!isFunctionComponent) {
-    if (!fiber.dom) {
-      const dom = (fiber.dom = createDom(fiber.type));
+function updateFunctionComponent(fiber) {
+  const children = [fiber.type(fiber.props)];
+  initChildren(fiber, children);
+}
 
-      updateProps(dom, fiber.props);
-    }
+function updateHostComponent(fiber) {
+  if (!fiber.dom) {
+    const dom = (fiber.dom = createDom(fiber.type));
+
+    updateProps(dom, fiber.props);
   }
 
-  const children = isFunctionComponent
-    ? [fiber.type(fiber.props)]
-    : fiber.props.children;
+  const children = fiber.props.children;
 
   initChildren(fiber, children);
+}
+
+function performWorkOfUnit(fiber) {
+  console.log(fiber);
+
+  const isFunctionComponent = typeof fiber.type === "function";
+  if (!isFunctionComponent) {
+    updateHostComponent(fiber);
+  } else {
+    updateFunctionComponent(fiber);
+  }
 
   if (fiber.child) {
     return fiber.child;
   }
 
-  // if (fiber.sibling) {
-  //   return fiber.sibling;
-  // }
   let nextFiber = fiber;
   while (nextFiber) {
     if (nextFiber.sibling) return nextFiber.sibling;
     nextFiber = nextFiber.parent;
   }
-
-  // return fiber.parent?.sibling;
 }
 
 function commitRoot() {
